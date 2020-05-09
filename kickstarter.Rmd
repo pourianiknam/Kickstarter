@@ -1,0 +1,22 @@
+---
+title: "Kickstarter"
+author: "Pouria Niknam"
+date: "5/9/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(readr)
+```
+
+```{r}
+kickstart <- list.files(path="yourpath", full.names = TRUE) %>% 
+  lapply(read_csv) %>% 
+  bind_rows
+```
+
