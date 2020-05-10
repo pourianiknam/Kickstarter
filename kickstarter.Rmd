@@ -1,7 +1,7 @@
 ---
 title: "Kickstarter"
 author: "Pouria Niknam"
-date: "5/9/2020"
+date: "5/9/2020"str
 output: pdf_document
 ---
 
@@ -9,14 +9,51 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
 library(dplyr)
 library(readr)
+library(lubridate)
+library(stringr)
 ```
 
-```{r}
-kickstart <- list.files(path="yourpath", full.names = TRUE) %>% 
+```{r, eval=FALSE}
+kickstart <- list.files(path="C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kickstarter", full.names = TRUE) %>% 
   lapply(read_csv) %>% 
   bind_rows
 ```
+```{r, eval=FALSE}
+write_csv(kickstart,pa th="C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kickstarter.csv")
+```
+```{r, message=FALSE,echo=FALSE,warning=FALSE,eval=FALSE}
+kickstart <- read_csv("C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kickstarter.csv")
+```
 
+```{r, message=FALSE,echo=FALSE,warning=FALSE,eval=FALSE}
+set.seed(2, sample.kind = "Rounding")
+n = dim(kickstart[1])
+sample.list <- sample.int(n, size = 5000, replace = FALSE)
+ks.sample <- kickstart[sample.list,]
+```
+```{r, eval=FALSE}
+write_csv(ks.sample,path="C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\ks.sample.csv")
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+ks.sample <- read_csv("C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\ks.sample.csv")
+```
+
+```{r}
+ks.sample$created_at <- as_datetime(ks.sample$created_at)
+ks.sample$deadline <- as_datetime(ks.sample$deadline)
+ks.sample$launched_at <- as_datetime(ks.sample$launched_at)
+```
+
+```{r}
+ks.sample <- ks.sample[,-2]
+```
+
+```{r}
+test <- lapply(ks.sample$category, str_replace_all, '[[:punct:]]',' ')
+test <- lapply(test, str_squish)
+test <- data.frame(matrix(unlist(test), nrow=5000, byrow=T),stringsAsFactors=FALSE)
+```
