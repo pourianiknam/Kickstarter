@@ -43,17 +43,44 @@ ks.sample <- read_csv("C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\ks.sample.
 ```
 
 ```{r}
-ks.sample$created_at <- as_datetime(ks.sample$created_at)
 ks.sample$deadline <- as_datetime(ks.sample$deadline)
 ks.sample$launched_at <- as_datetime(ks.sample$launched_at)
+ks.sample$state_changed_at <- as_datetime(ks.sample$state_changed_at)
+
+ks.sample$live_period <- as.integer(difftime(ks.sample$deadline, ks.sample$launched_at, units = "days"))
+ks.sample$state_change_period <- as.integer(difftime(ks.sample$state_changed_at, ks.sample$launched_at, units = "days"))
+
+ks.sample$country <- as.factor(ks.sample$country)
+ks.sample$currency <- as.factor(ks.sample$currency)
+ks.sample <- subset(ks.sample, ks.sample$state != "live")
+ks.sample$state <- as.factor(ks.sample$state)
+
+
+ks.sample$usd_goal <- ks.sample$goal*ks.sample$static_usd_rate
 ```
 
 ```{r}
-ks.sample <- ks.sample[,-2]
+ks.sample <- ks.sample[,-c(2,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,34,35,36,38)]
 ```
 
 ```{r}
-test <- lapply(ks.sample$category, str_replace_all, '[[:punct:]]',' ')
-test <- lapply(test, str_squish)
-test <- data.frame(matrix(unlist(test), nrow=5000, byrow=T),stringsAsFactors=FALSE)
+summary(ks.sample)
+write_csv(ks.sample, "ks.sample.clean.csv")
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+test.df <- str_replace_all(ks.sample$category[2],'[:punct:]', " ")
+test.df <- str_squish(test.df)
+test.df <- str_split(test.df, " ")
+test.df <-unlist(test.df, use.names=FALSE)
+category <- test.df[6:7]
+#test <- lapply(ks.sample$category, str_extract, "[[:slug\":\":]]")
+#test <- lapply(test, str_squish)
+#test.df <- data.frame(test)
 ```
