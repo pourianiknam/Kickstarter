@@ -28,45 +28,6 @@ write_csv(kickstart,pa th="C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kickst
 kickstart <- read_csv("C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kickstarter.csv")
 ```
 
-```{r, message=FALSE,echo=FALSE,warning=FALSE,eval=FALSE}
-set.seed(2, sample.kind = "Rounding")
-n = dim(kickstart[1])
-sample.list <- sample.int(n, size = 5000, replace = FALSE)
-ks.sample <- kickstart[sample.list,]
-```
-```{r, eval=FALSE}
-write_csv(ks.sample,path="C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\ks.sample.csv")
-```
-
-```{r, message=FALSE,echo=FALSE,warning=FALSE}
-ks.sample <- read_csv("C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\ks.sample.csv")
-```
-
-```{r}
-ks.sample$deadline <- as_datetime(ks.sample$deadline)
-ks.sample$launched_at <- as_datetime(ks.sample$launched_at)
-ks.sample$state_changed_at <- as_datetime(ks.sample$state_changed_at)
-
-ks.sample$live_period <- as.integer(difftime(ks.sample$deadline, ks.sample$launched_at, units = "days"))
-ks.sample$state_change_period <- as.integer(difftime(ks.sample$state_changed_at, ks.sample$launched_at, units = "days"))
-
-ks.sample$country <- as.factor(ks.sample$country)
-ks.sample$currency <- as.factor(ks.sample$currency)
-ks.sample <- subset(ks.sample, ks.sample$state != "live")
-ks.sample$state <- as.factor(ks.sample$state)
-
-
-ks.sample$usd_goal <- ks.sample$goal*ks.sample$static_usd_rate
-```
-
-```{r}
-ks.sample <- ks.sample[,-c(2,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,34,35,36,38)]
-```
-
-```{r}
-summary(ks.sample)
-write_csv(ks.sample, "ks.sample.clean.csv")
-```
 
 ```{r}
 kickstart$deadline <- as_datetime(kickstart$deadline)
@@ -88,16 +49,6 @@ kickstart$usd_goal <- kickstart$goal*kickstart$static_usd_rate
 ```{r}
 kickstart <- kickstart[,-c(2,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,34,35,36,38)]
 ```
-
-```{r}
-summary(kickstart)
-write_csv(kickstart, "kickstarter.clean.csv")
-```
-
-```{r, message=FALSE,echo=FALSE,warning=FALSE}
-kickstart <- read_csv("kickstarter.clean.csv")
-```
-
 
 ```{r}
 test <- lapply(kickstart$category, strsplit, ",")
@@ -133,15 +84,60 @@ for (k in 1:n){
 ```{r}
 kickstart$category <- category
 kickstart$main.category <- main.category
-kickstart$category <- as.factor(kickstart$category)
-kickstart$main.category <- as.factor(kickstart$main.category)
-```
-```{r}
-summary(kickstart)
 ```
 
 ```{r}
-sum(kickstart$main.category == "{web")
+for (l in 1:n){
+  if (kickstart$main.category[l] == "{web"){
+    if (kickstart$category[l] == "fashion") {
+      kickstart$main.category[l] = "Fashion"
+    } else if (kickstart$category[l] == "technology") {
+      kickstart$main.category[l] = "Technology"
+    } else if (kickstart$category[l] == "music") {
+      kickstart$main.category[l] = "Music"
+    } else if (kickstart$category[l] == "theater") {
+      kickstart$main.category[l] = "Theater"
+    } else if (kickstart$category[l] == "food") {
+      kickstart$main.category[l] = "Food"
+    } else if (kickstart$category[l] == "journalism") {
+      kickstart$main.category[l] = "Journalism"
+    } else if (kickstart$category[l] == "design") {
+      kickstart$main.category[l] = "Design"
+    } else if (kickstart$category[l] == "publishing") {
+      kickstart$main.category[l] = "Publishing"
+    } else if (kickstart$category[l] == "art") {
+      kickstart$main.category[l] = "Art"
+    } else if (kickstart$category[l] == "comics") {
+      kickstart$main.category[l] = "Comics"
+    } else if (kickstart$category[l] == "photography") {
+      kickstart$main.category[l] = "Photography"
+    } else if (kickstart$category[l] == "crafts") {
+      kickstart$main.category[l] = "Crafts"
+    } else if (kickstart$category[l] == "dance") {
+      kickstart$main.category[l] = "Dance"
+    } else if (kickstart$category[l] == "film & video") {
+      kickstart$main.category[l] = "Film & Video"
+    }
+  }
+}
+```
+
+```{r}
+kickstart$category <- as.factor(kickstart$category)
+kickstart$main.category <- as.factor(kickstart$main.category)
+```
+
+```{r}
+write_csv(kickstart, "kickstarter.clean.csv")
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+#kickstart <- read_csv("kickstarter.cleanle.csv")
+summary(kickstart)
+```
+
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
+kickstart <- read_csv("kickstarter.cleanle.csv")
 ```
 
 
