@@ -57,3 +57,54 @@ write_csv(kickstart, "kickstarter.clean.csv")
 ```{r, message=FALSE,echo=FALSE,warning=FALSE}
 kickstart <- read_csv("kickstarter.clean.csv")
 ```
+
+```{r}
+# Using Box-Cox transform to reduce skewedness
+box.backers <- EnvStats::boxcox(kickstart$backers_count + 1)
+best.lambda.backers <- box.backers$lambda[which.max(box.backers$objective)]
+kickstart$box.backers <- boxcoxTransform(kickstart$backers_count + 1, best.lambda.backers)
+
+box.pledged <- EnvStats::boxcox(kickstart$usd_pledged + 1)
+best.lambda.pledged <- box.pledged$lambda[which.max(box.pledged$objective)]
+kickstart$box.pledged <- boxcoxTransform(kickstart$usd_pledged + 1, best.lambda.pledged)
+
+box.goal <- EnvStats::boxcox(kickstart$usd_goal + 1)
+best.lambda.goal <- box.goal$lambda[which.max(box.goal$objective)]
+kickstart$box.goal <- boxcoxTransform(kickstart$usd_goal + 1, best.lambda.goal)
+```
+
+```{r}
+hist(kickstart$box.backers)
+hist(kickstart$box.pledged)
+hist(kickstart$box.goal)
+```
+
+```{r}
+kickstart.lm <- kickstart[,-c(1,7,10)]
+len <- dim(kickstart.lm)[1]
+```
+
+```{r}
+plot(kickstart.lm$box.goal ~ kickstart.lm$box.backers)
+plot(kickstart.lm$box.goal ~ kickstart.lm$box.pledged)
+```
+
+
+
+```{r}
+set.seed(37, sample.kind = "Rounding")
+groupi = sample(len, round(len/5), replace = FALSE)
+```
+
+```{r}
+fit <- glm(state~., data = kickstart.lm[groupi,], family = "binomial")
+```
+
+```{r}
+#system.time(regfit.full <- regsubsets(state~., data = kickstart.lm[groupi,], nvmax = 50, really.big = TRUE))
+```
+
+
+
+
+

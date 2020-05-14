@@ -14,8 +14,9 @@ library(dplyr)
 library(readr)
 library(lubridate)
 library(stringr)
-library(EnvStats)
-library(leaps)
+library(tree)
+library(randomForest)
+library(gbm)
 ```
 
 ```{r, eval=FALSE}
@@ -29,7 +30,6 @@ write_csv(kickstart,pa th="C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kickst
 ```{r, message=FALSE,echo=FALSE,warning=FALSE}
 kickstart <- read_csv("C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kickstarter.csv")
 ```
-
 
 ```{r}
 kickstart$deadline <- as_datetime(kickstart$deadline)
@@ -129,11 +129,11 @@ kickstart$category <- as.factor(kickstart$category)
 kickstart$main.category <- as.factor(kickstart$main.category)
 ```
 
-```{r}
+```{r, eval=FALSE}
 write_csv(kickstart, "kickstarter.clean.csv")
 ```
 
-```{r}
+```{r, eval=FALSE}
 summary(kickstart)
 ```
 
@@ -154,53 +154,29 @@ boxplot(kickstart$usd_goal)
 ```
 
 ```{r}
-# Using Box-Cox transform to reduce skewedness
-box.backers <- EnvStats::boxcox(kickstart$backers_count + 1)
-best.lambda.backers <- box.backers$lambda[which.max(box.backers$objective)]
-kickstart$box.backers <- boxcoxTransform(kickstart$backers_count + 1, best.lambda.backers)
-
-box.pledged <- EnvStats::boxcox(kickstart$usd_pledged + 1)
-best.lambda.pledged <- box.pledged$lambda[which.max(box.pledged$objective)]
-kickstart$box.pledged <- boxcoxTransform(kickstart$usd_pledged + 1, best.lambda.pledged)
-
-box.goal <- EnvStats::boxcox(kickstart$usd_goal + 1)
-best.lambda.goal <- box.goal$lambda[which.max(box.goal$objective)]
-kickstart$box.goal <- boxcoxTransform(kickstart$usd_goal + 1, best.lambda.goal)
-```
-
-```{r}
-hist(kickstart$box.backers)
-hist(kickstart$box.pledged)
-hist(kickstart$box.goal)
-```
-
-```{r}
 hist(kickstart$live_period)
 hist(kickstart$state_change_period)
 ```
 
-
-
 ```{r}
-kickstart.lm <- kickstart[,-c(1,7,10)]
+set.seed(7, sample.kind = "Rounding")
+train = sample(1:n, round(n/5), replace = F)
+ks.tree <- tree(state ~ ., data = kickstart[train,-2])
+summary(ks.tree)
 ```
 
 ```{r}
-
+plot(ks.tree)
+text(ks.tree, pretty = 0)
 ```
 
 ```{r}
-regfit.full <- regsubsets(state~., data = kickstart.lm, nvmax = 50, really.big = TRUE)
+item.pred <- predict(ks.tree, kickstart[-train,], type = "class")
+table(item.pred, kickstart$state[-train])
 ```
-
-
-
-
-
-
-
-
-
+```{r}
+1880/(5015+58039+95420)
+```
 
 
 
