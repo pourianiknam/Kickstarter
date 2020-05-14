@@ -14,6 +14,8 @@ library(dplyr)
 library(readr)
 library(lubridate)
 library(stringr)
+library(EnvStats)
+library(leaps)
 ```
 
 ```{r, eval=FALSE}
@@ -24,7 +26,7 @@ kickstart <- list.files(path="C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kic
 ```{r, eval=FALSE}
 write_csv(kickstart,pa th="C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kickstarter.csv")
 ```
-```{r, message=FALSE,echo=FALSE,warning=FALSE,eval=FALSE}
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
 kickstart <- read_csv("C:\\Users\\Pouria\\OneDrive - UWGB\\Documents\\Kickstarter.csv")
 ```
 
@@ -131,13 +133,90 @@ kickstart$main.category <- as.factor(kickstart$main.category)
 write_csv(kickstart, "kickstarter.clean.csv")
 ```
 
-```{r, message=FALSE,echo=FALSE,warning=FALSE}
-#kickstart <- read_csv("kickstarter.cleanle.csv")
+```{r}
 summary(kickstart)
 ```
 
 ```{r, message=FALSE,echo=FALSE,warning=FALSE}
-kickstart <- read_csv("kickstarter.cleanle.csv")
+#kickstart <- read_csv("kickstarter.clean.csv")
 ```
+
+```{r}
+hist(kickstart$backers_count)
+hist(kickstart$usd_pledged)
+hist(kickstart$usd_goal)
+```
+
+```{r}
+boxplot(kickstart$backers_count)
+boxplot(kickstart$usd_pledged)
+boxplot(kickstart$usd_goal)
+```
+
+```{r}
+# Using Box-Cox transform to reduce skewedness
+box.backers <- EnvStats::boxcox(kickstart$backers_count + 1)
+best.lambda.backers <- box.backers$lambda[which.max(box.backers$objective)]
+kickstart$box.backers <- boxcoxTransform(kickstart$backers_count + 1, best.lambda.backers)
+
+box.pledged <- EnvStats::boxcox(kickstart$usd_pledged + 1)
+best.lambda.pledged <- box.pledged$lambda[which.max(box.pledged$objective)]
+kickstart$box.pledged <- boxcoxTransform(kickstart$usd_pledged + 1, best.lambda.pledged)
+
+box.goal <- EnvStats::boxcox(kickstart$usd_goal + 1)
+best.lambda.goal <- box.goal$lambda[which.max(box.goal$objective)]
+kickstart$box.goal <- boxcoxTransform(kickstart$usd_goal + 1, best.lambda.goal)
+```
+
+```{r}
+hist(kickstart$box.backers)
+hist(kickstart$box.pledged)
+hist(kickstart$box.goal)
+```
+
+```{r}
+hist(kickstart$live_period)
+hist(kickstart$state_change_period)
+```
+
+
+
+```{r}
+kickstart.lm <- kickstart[,-c(1,7,10)]
+```
+
+```{r}
+
+```
+
+```{r}
+regfit.full <- regsubsets(state~., data = kickstart.lm, nvmax = 50, really.big = TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
