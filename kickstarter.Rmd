@@ -178,13 +178,42 @@ table(item.pred, kickstart$state[-train])
 1880/(5015+58039+95420)
 ```
 
+```{r}
+kickstart.cv <- cv.tree(ks.tree, FUN = prune.misclass)
+kickstart.cv
+plot(kickstart.cv)
+kickstart.cv$size[which(kickstart.cv$dev == min(kickstart.cv$dev))]
+```
+
+```{r}
+ks.mat <- model.matrix(state~., data = kickstart)
+ks.df <- data.frame(cbind(ks.mat[,-1], kickstart$state))
+ks.df$V211 <- as.factor(ks.df$V211)
+```
+
+```{r}
+set.seed(37, sample.kind = "Rounding")
+train2 = sample(1:n, round(n/5), replace = F)
+ks.tree2 <- tree(V211 ~ ., data = ks.df[train2,-1])
+summary(ks.tree2)
+```
+
+```{r}
+plot(ks.tree2)
+text(ks.tree2, pretty = 0)
+```
 
 
-
-
-
-
-
+```{r}
+kickstart.cv <- cv.tree(ks.tree2, FUN = prune.misclass)
+kickstart.cv
+plot(kickstart.cv)
+kickstart.cv$size[which(kickstart.cv$dev == min(kickstart.cv$dev))]
+```
+```{r}
+item.pred2 <- predict(ks.tree2, ks.df[-train,], type = "class")
+table(item.pred2, ks.df$V211[-train])
+```
 
 
 
