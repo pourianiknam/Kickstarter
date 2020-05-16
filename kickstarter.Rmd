@@ -227,7 +227,7 @@ ks.df$V43 <- as.factor(ks.df$V43)
 names(ks.df)[43] <- "state"
 ```
 
-```{r}
+```{r, eval=FALSE}
 set.seed(69, sample.kind = "Rounding")
 valid = sample(1:n, round(n/5), replace = F)
 train = c(1:n)[-valid]
@@ -236,12 +236,49 @@ valid.nnet = ks.df[valid,]
 nnet.fit <- nnet(state ~ ., data = train.nnet, size = 10, maxit = 1000, trace = F, decay = 0.001)
 ````
 
-```{r}
+```{r, eval=FALSE}
 nnet.pred <- predict(nnet.fit, valid.nnet, type = "class")
 pred.error = sum(nnet.pred != valid.nnet$state)/dim(valid.nnet)[1]
 pred.error
 table(nnet.pred, valid.nnet$state)
 ```
 
+```{r, eval=FALSE}
+plotnet(nnet.fit)
+```
 
+```{r}
+set.seed(67, sample.kind = "Rounding")
+valid = sample(1:n, round(n/10), replace = F)
+train = c(1:n)[-valid]
+train.nnet = ks.df[train,]
+valid.nnet = ks.df[valid,]
+````
 
+```{r}
+i=1
+j=1
+sizes = seq(1, 50, 1)
+decayRate = seq(0, 1, .01)
+pred.error = matrix(data=NA,nrow=length(sizes),ncol=length(decayRate))
+set.seed(63, sample.kind = "Rounding")
+# Training neural networks with different number of hidden nodes to find the number of nodes resulting in the lowest error. 
+for (i in 1:length(sizes)) {
+  for (j in 1:length(decayRate)){
+    ANN.fit <- nnet(state~., data = train.nnet, size = sizes[i], maxit = 10000, trace = F, decay = decayRate[j])
+    ANN.pred <- predict(ANN.fit, valid.nnet, type = "class")
+    pred.error[i,j] = sum(ANN.pred != valid.nnet$state)/dim(valid.nnet)[1]
+  }
+}
+```
+
+```{r}
+min(pred.error)
+best.size.ANN <- arrayInd(which.min(pred.error), dim(pred.error)) 
+```
+
+```{r fig.height=20, fig.width=20}
+best.fit.ANN <- nnet(state~., data = train.nnet, size = best.size.ANN[1], maxit = 10000, trace = F, decay = best.size.ANN[2])
+# Creates a plot fo the neural network with the optimum values
+plotnet(best.fit.ANN)
+```
