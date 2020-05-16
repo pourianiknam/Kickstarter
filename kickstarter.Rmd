@@ -17,6 +17,8 @@ library(stringr)
 library(tree)
 library(randomForest)
 library(gbm)
+library(nnet)
+library(NeuralNetTools)
 ```
 
 ```{r, eval=FALSE}
@@ -189,12 +191,13 @@ kickstart.cv$size[which(kickstart.cv$dev == min(kickstart.cv$dev))]
 ks.mat <- model.matrix(state~., data = kickstart)
 ks.df <- data.frame(cbind(ks.mat[,-1], kickstart$state))
 ks.df$V211 <- as.factor(ks.df$V211)
+names(ks.df)[211] <- "state"
 ```
 
 ```{r}
 set.seed(37, sample.kind = "Rounding")
 train2 = sample(1:n, round(n/5), replace = F)
-ks.tree2 <- tree(V211 ~ ., data = ks.df[train2,-1])
+ks.tree2 <- tree(state ~ ., data = ks.df[train2,-1])
 summary(ks.tree2)
 ```
 
@@ -212,16 +215,33 @@ kickstart.cv$size[which(kickstart.cv$dev == min(kickstart.cv$dev))]
 ```
 ```{r}
 item.pred2 <- predict(ks.tree2, ks.df[-train,], type = "class")
-table(item.pred2, ks.df$V211[-train])
+table(item.pred2, ks.df$state[-train])
 ```
 
+```{r}
+ks.mat <- kickstart[,-2]
+ks.mat <- model.matrix(state~., data = ks.mat)
+ks.mat <- scale(ks.mat)
+ks.df <- data.frame(cbind(ks.mat[,-1], kickstart$state))
+ks.df$V43 <- as.factor(ks.df$V43)
+names(ks.df)[43] <- "state"
+```
 
+```{r}
+set.seed(69, sample.kind = "Rounding")
+valid = sample(1:n, round(n/5), replace = F)
+train = c(1:n)[-valid]
+train.nnet = ks.df[train,]
+valid.nnet = ks.df[valid,]
+nnet.fit <- nnet(state ~ ., data = train.nnet, size = 10, maxit = 1000, trace = F, decay = 0.001)
+````
 
-
-
-
-
-
+```{r}
+nnet.pred <- predict(nnet.fit, valid.nnet, type = "class")
+pred.error = sum(nnet.pred != valid.nnet$state)/dim(valid.nnet)[1]
+pred.error
+table(nnet.pred, valid.nnet$state)
+```
 
 
 
