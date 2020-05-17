@@ -258,8 +258,8 @@ valid.nnet = ks.df[valid,]
 ```{r}
 i=1
 j=1
-sizes = seq(1, 50, 1)
-decayRate = seq(0, 1, .01)
+sizes = seq(1, 10, 1)
+decayRate = seq(0, 1, .1)
 pred.error = matrix(data=NA,nrow=length(sizes),ncol=length(decayRate))
 set.seed(63, sample.kind = "Rounding")
 # Training neural networks with different number of hidden nodes to find the number of nodes resulting in the lowest error. 
