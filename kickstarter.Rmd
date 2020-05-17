@@ -227,7 +227,7 @@ ks.df$V43 <- as.factor(ks.df$V43)
 names(ks.df)[43] <- "state"
 ```
 
-```{r, eval=FALSE}
+```{r}
 set.seed(69, sample.kind = "Rounding")
 valid = sample(1:n, round(n/5), replace = F)
 train = c(1:n)[-valid]
@@ -236,20 +236,20 @@ valid.nnet = ks.df[valid,]
 nnet.fit <- nnet(state ~ ., data = train.nnet, size = 10, maxit = 1000, trace = F, decay = 0.001)
 ````
 
-```{r, eval=FALSE}
+```{r}
 nnet.pred <- predict(nnet.fit, valid.nnet, type = "class")
 pred.error = sum(nnet.pred != valid.nnet$state)/dim(valid.nnet)[1]
 pred.error
 table(nnet.pred, valid.nnet$state)
 ```
 
-```{r, eval=FALSE}
+```{r fig.width=20, fig.height=20}
 plotnet(nnet.fit)
 ```
 
 ```{r}
 set.seed(67, sample.kind = "Rounding")
-valid = sample(1:n, round(n/10), replace = F)
+valid = sample(1:n, round(n/5), replace = F)
 train = c(1:n)[-valid]
 train.nnet = ks.df[train,]
 valid.nnet = ks.df[valid,]
