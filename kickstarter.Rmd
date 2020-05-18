@@ -249,7 +249,7 @@ plotnet(nnet.fit)
 
 ```{r}
 set.seed(67, sample.kind = "Rounding")
-valid = sample(1:n, round(n/5), replace = F)
+valid = sample(1:n, round(n/3), replace = F)
 train = c(1:n)[-valid]
 train.nnet = ks.df[train,]
 valid.nnet = ks.df[valid,]
@@ -281,4 +281,7 @@ best.size.ANN <- arrayInd(which.min(pred.error), dim(pred.error))
 best.fit.ANN <- nnet(state~., data = train.nnet, size = best.size.ANN[1], maxit = 10000, trace = F, decay = best.size.ANN[2])
 # Creates a plot fo the neural network with the optimum values
 plotnet(best.fit.ANN)
+```
+```{r}
+best.fit.ANN$wts
 ```
